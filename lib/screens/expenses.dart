@@ -39,11 +39,44 @@ class _ExpensesState extends State<Expenses> {
     ),
   ];
 
+  void _openAddNewExpenseOverlay() {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        spacing: 4,
+        children: [Text("Bottom Sheet")],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Flutter Expense Tracker",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: Color.fromARGB(255, 255, 255, 255),
+          ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 108, 4, 4),
+        actions: [
+          IconButton(
+            onPressed: _openAddNewExpenseOverlay,
+            icon: const Icon(
+              Icons.add,
+              color: Color.fromARGB(255, 255, 255, 255),
+            ),
+          ),
+        ],
+      ),
       body: Column(
+        spacing: 4,
         children: [
+          const SizedBox(height: 4),
           const Text('The cart'),
           Expanded(child: ExpensesList(expenses: _registeredExpenses)),
         ],
