@@ -1,5 +1,6 @@
 import 'package:expense_tracker/models/expense.dart';
 import 'package:expense_tracker/shared/widgets/expenses_List/expenses_list.dart';
+import 'package:expense_tracker/shared/widgets/new_expense.dart';
 import 'package:flutter/material.dart';
 
 class Expenses extends StatefulWidget {
@@ -40,15 +41,7 @@ class _ExpensesState extends State<Expenses> {
   ];
 
   void _openAddNewExpenseOverlay() {
-    showModalBottomSheet(
-      context: context,
-      builder: (ctx) => Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: 4,
-        children: [Text("Bottom Sheet")],
-      ),
-    );
+    showModalBottomSheet(context: context, builder: (ctx) => NewExpense());
   }
 
   @override
@@ -59,16 +52,16 @@ class _ExpensesState extends State<Expenses> {
           "Flutter Expense Tracker",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            color: Color.fromARGB(255, 255, 255, 255),
+            color: Theme.of(context).colorScheme.onPrimary,
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 108, 4, 4),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           IconButton(
             onPressed: _openAddNewExpenseOverlay,
-            icon: const Icon(
+            icon: Icon(
               Icons.add,
-              color: Color.fromARGB(255, 255, 255, 255),
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
           ),
         ],
