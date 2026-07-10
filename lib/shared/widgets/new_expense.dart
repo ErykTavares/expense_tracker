@@ -4,16 +4,59 @@ import 'package:flutter/services.dart';
 import 'package:expense_tracker/models/expense.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  const NewExpense({super.key, required this.onAddExpense});
+
+  final void Function(Expense expense) onAddExpense;
 
   @override
-  _NewExpenseState createState() => _NewExpenseState();
+  State<NewExpense> createState() => _NewExpenseState();
 }
 
 class _NewExpenseState extends State<NewExpense> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   DateTime? _selectedDate;
+  Category? _selectedCategory = Category.food;
+  final categoryDropdownList = Category.values
+      .map(
+        (item) =>
+            DropdownMenuItem(value: item, child: Text(item.name.toUpperCase())),
+      )
+      .toList();
+
+  Widget dateDialogBuilder(context, child) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        datePickerTheme: DatePickerThemeData(
+          headerBackgroundColor: Theme.of(context).colorScheme.primary,
+          headerForegroundColor: Theme.of(context).colorScheme.onPrimary,
+          dividerColor: Theme.of(context).colorScheme.primary,
+        ),
+        colorScheme: ColorScheme.light(
+          primary: Theme.of(context).colorScheme.primary,
+          onPrimary: Colors.white,
+          surface: Theme.of(context).colorScheme.surface,
+          onSurface: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+      child: child!,
+    );
+  }
+
+  Widget submitFormDialogBuilder(ctx) => AlertDialog(
+    title: const Text("Invalid fields!"),
+    content: const Text(
+      "Please make sure a valid title, amount, and date was entered.",
+    ),
+    actions: [
+      Button(
+        text: "Okay",
+        onPressed: () {
+          Navigator.pop(ctx);
+        },
+      ),
+    ],
+  );
 
   void _presentDatePicker() async {
     final now = DateTime.now();
@@ -23,30 +66,46 @@ class _NewExpenseState extends State<NewExpense> {
       context: context,
       initialDate: now,
       firstDate: firstDate,
-      lastDate: now,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            datePickerTheme: DatePickerThemeData(
-              headerBackgroundColor: Theme.of(context).colorScheme.primary,
-              headerForegroundColor: Theme.of(context).colorScheme.onPrimary,
-              dividerColor: Theme.of(context).colorScheme.primary,
-            ),
-            colorScheme: ColorScheme.light(
-              primary: Theme.of(context).colorScheme.primary,
-              onPrimary: Colors.white,
-              surface: Theme.of(context).colorScheme.surface,
-              onSurface: Theme.of(context).colorScheme.primary,
-            ),
-          ),
-          child: child!,
-        );
-      },
+      lastDate: now.add(const Duration(days: 30)),
+      builder: dateDialogBuilder,
     );
 
     setState(() {
       _selectedDate = pickedDate;
     });
+  }
+
+  void onSetCategory(Category? category) {
+    if (category == null) {
+      return;
+    }
+
+    setState(() {
+      _selectedCategory = category;
+    });
+  }
+
+  void onSubmitForm() {
+    final enteredAmount = double.tryParse(_amountController.text);
+    final amountIsInvalid = enteredAmount == null || enteredAmount <= 0;
+
+    if (_titleController.text.trim().isEmpty ||
+        amountIsInvalid ||
+        _selectedDate == null) {
+      showDialog(context: context, builder: submitFormDialogBuilder);
+      return;
+    }
+
+    widget.onAddExpense(
+      Expense(
+        title: _titleController.text,
+        amount: enteredAmount,
+        date: _selectedDate!,
+        category: _selectedCategory!,
+      ),
+    );
+
+    Navigator.pop(context);
   }
 
   void onCancel() {
@@ -127,25 +186,22 @@ class _NewExpenseState extends State<NewExpense> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             mainAxisSize: MainAxisSize.max,
+            spacing: 16,
             children: [
+              const SizedBox(width: 1),
+              DropdownButton(
+                items: categoryDropdownList,
+                value: _selectedCategory,
+                onChanged: onSetCategory,
+              ),
+              const Spacer(),
               Button(
                 text: "Cancel",
                 onPressed: onCancel,
                 bgColor: Theme.of(context).colorScheme.secondary,
                 textColor: Theme.of(context).colorScheme.onError,
               ),
-              Button(
-                text: "Save Expense",
-                onPressed: () {
-                  print("====================");
-                  print("title: ${_titleController.text}");
-                  print("====================");
-                  print("amount: ${_amountController.text}");
-                  print("====================");
-                  print("date: ${_selectedDate.toString()}");
-                  print("====================");
-                },
-              ),
+              Button(text: "Save Expense", onPressed: onSubmitForm),
             ],
           ),
         ],
