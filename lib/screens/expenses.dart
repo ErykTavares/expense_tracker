@@ -79,7 +79,10 @@ class _ExpensesState extends State<Expenses> {
         spacing: 4,
         children: [
           const SizedBox(height: 4),
-          const Text('The cart'),
+          const Text(
+            'The cart',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
+          ),
           Expanded(child: ExpensesList(expenses: _registeredExpenses)),
         ],
       ),
