@@ -13,32 +13,6 @@ class Expenses extends StatefulWidget {
 }
 
 class _ExpensesState extends State<Expenses> {
-  // final List<Expense> _registeredExpenses = [
-  //   Expense(
-  //     title: 'Japão',
-  //     amount: 3500,
-  //     category: Category.travel,
-  //     date: DateTime(2026, 7, 15),
-  //   ),
-  //   Expense(
-  //     title: 'One piece Stampede',
-  //     amount: 18.99,
-  //     category: Category.leisure,
-  //     date: DateTime.now(),
-  //   ),
-  //   Expense(
-  //     title: 'Home Renovation',
-  //     amount: 5370,
-  //     category: Category.work,
-  //     date: DateTime(2026, 5, 05),
-  //   ),
-  //   Expense(
-  //     title: 'Shrimp bean ball',
-  //     amount: 22.50,
-  //     category: Category.food,
-  //     date: DateTime(2026, 4, 23),
-  //   ),
-  // ];
   final List<Expense> _registeredExpenses = [];
 
   void onAddExpense(Expense expense) {
@@ -48,9 +22,29 @@ class _ExpensesState extends State<Expenses> {
   }
 
   void onRemoveExpense(Expense expense) {
+    final expenseIndex = _registeredExpenses.indexOf(expense);
+
     setState(() {
       _registeredExpenses.remove(expense);
     });
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 5),
+        content: const Text("Expense removed."),
+        action: SnackBarAction(
+          label: "Undo",
+          onPressed: () {
+            setState(() {
+              _registeredExpenses.insert(expenseIndex, expense);
+            });
+          },
+        ),
+      ),
+    );
   }
 
   void _openAddNewExpenseOverlay() {
