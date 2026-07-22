@@ -13,32 +13,33 @@ class Expenses extends StatefulWidget {
 }
 
 class _ExpensesState extends State<Expenses> {
-  final List<Expense> _registeredExpenses = [
-    Expense(
-      title: 'Japão',
-      amount: 3500,
-      category: Category.travel,
-      date: DateTime(2026, 7, 15),
-    ),
-    Expense(
-      title: 'One piece Stampede',
-      amount: 18.99,
-      category: Category.leisure,
-      date: DateTime.now(),
-    ),
-    Expense(
-      title: 'Home Renovation',
-      amount: 5370,
-      category: Category.work,
-      date: DateTime(2026, 5, 05),
-    ),
-    Expense(
-      title: 'Shrimp bean ball',
-      amount: 22.50,
-      category: Category.food,
-      date: DateTime(2026, 4, 23),
-    ),
-  ];
+  // final List<Expense> _registeredExpenses = [
+  //   Expense(
+  //     title: 'Japão',
+  //     amount: 3500,
+  //     category: Category.travel,
+  //     date: DateTime(2026, 7, 15),
+  //   ),
+  //   Expense(
+  //     title: 'One piece Stampede',
+  //     amount: 18.99,
+  //     category: Category.leisure,
+  //     date: DateTime.now(),
+  //   ),
+  //   Expense(
+  //     title: 'Home Renovation',
+  //     amount: 5370,
+  //     category: Category.work,
+  //     date: DateTime(2026, 5, 05),
+  //   ),
+  //   Expense(
+  //     title: 'Shrimp bean ball',
+  //     amount: 22.50,
+  //     category: Category.food,
+  //     date: DateTime(2026, 4, 23),
+  //   ),
+  // ];
+  final List<Expense> _registeredExpenses = [];
 
   void onAddExpense(Expense expense) {
     setState(() {
@@ -62,6 +63,20 @@ class _ExpensesState extends State<Expenses> {
 
   @override
   Widget build(BuildContext context) {
+    Widget mainContent = const Center(
+      child: Text(
+        'No expenses found. Start adding some!',
+        style: TextStyle(fontSize: 16),
+      ),
+    );
+
+    if (_registeredExpenses.isNotEmpty) {
+      mainContent = ExpensesList(
+        expenses: _registeredExpenses,
+        onRemoveExpense: onRemoveExpense,
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -90,12 +105,7 @@ class _ExpensesState extends State<Expenses> {
             'The chart',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400),
           ),
-          Expanded(
-            child: ExpensesList(
-              expenses: _registeredExpenses,
-              onRemoveExpense: onRemoveExpense,
-            ),
-          ),
+          Expanded(child: mainContent),
         ],
       ),
     );
